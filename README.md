@@ -1,4 +1,6 @@
 # DPDist : Comparing Point Clouds Using Deep Point Cloud Distance
+Created by [Dahlia Urbach](https://www.linkedin.com/in/dahlia-urbach-97a816123/), [Yizhak Ben-Shabat (Itzik)](http://www.itzikbs.com), and [Michael Lindenbaum](http://www.cs.technion.ac.il/people/mic/index.html).
+
 The code and pre-trained models will be available soon.
 
 https://arxiv.org/abs/2004.11784
