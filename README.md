@@ -16,3 +16,5 @@ Preprint:
       year={2020}
     }
 
+### License
+Our code is released under MIT License (see LICENSE file for details).
