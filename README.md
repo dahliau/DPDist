@@ -10,3 +10,16 @@ https://arxiv.org/abs/2004.11784
   year={2020}
 }`
 
+
+### Citation
+If you find our work useful in your research, please cite our work:
+
+Preprint: 
+
+    @article{urbach2020dpdist,
+    title={DPDist: Comparing Point Clouds Using Deep Point Cloud Distance},
+    author={Urbach, Dahlia and Ben-Shabat, Yizhak and Lindenbaum, Michael},
+    journal={arXiv preprint arXiv:2004.11784},
+    year={2020}
+    }
+
