@@ -2,7 +2,7 @@
 Created by [Dahlia Urbach](https://www.linkedin.com/in/dahlia-urbach-97a816123/), [Yizhak Ben-Shabat (Itzik)](http://www.itzikbs.com), and [Michael Lindenbaum](http://www.cs.technion.ac.il/people/mic/index.html) from Technion.
 
 ### Introduction
-![teaser](images/teaser.png)
+![teaser](images/teaser.PNG)
 
 We introduce a new deep learning method for point cloud comparison.  Our approach, named Deep Point Cloud Distance (DPDist),   measures the distance between the points in one cloud and the estimated surface from which the other point cloud is sampled. 
 The surface is estimated locally using the 3D modified Fisher vector representation. The local representation reduces the complexity of the surface, enabling effective learning, which generalizes well between object categories. 
