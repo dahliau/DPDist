@@ -1019,7 +1019,7 @@ def get_loss(pred_set, end_points,labels,loss_type = 'l1_dist'):
     pred_listBA = pred_set['pred_listBA']
     if loss_type == 'l1_dist':
         #loss1: L1
-        loss_samples = pred_listAB[:,:,:,0]
+        loss_samples = pred_listAB[:,:,:,0] #Only these labels use for training DPDist
         loss_samples = tf.squeeze(loss_samples)
         print('labels')
         print(loss_samples)

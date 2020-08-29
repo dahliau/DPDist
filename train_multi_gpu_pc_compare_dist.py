@@ -743,29 +743,32 @@ def train_one_epoch_3d(sess, ops, train_writer,epoch):
     batch_idx = 0
     total_loss_sum = 0
     total_count = 0
+
+    H_NUM_POINT = int(NUM_POINT / 2)  # training points: half rely on the surface, half off the surface.
+    split_off_surface = 0.5  # how many points from close to surface set,and the rest from the unit cube
     while TRAIN_DATASET.has_next_batch():
         batch_data, batch_label = TRAIN_DATASET.next_batch(augment=AUGMANTATIONS)
-        batch_data = batch_data
-        batch_data = np.split(batch_data,3,1) #obj, neg,neg_rand
-        batch_pos = np.split(batch_data[0],2,1)
+        # dataset include 3 * 10k points on surface, close to surface, random from the unit cube.
+        batch_data = np.split(batch_data, 3, 1)  # surface, close, far
+        batch_surface = np.split(batch_data[0], 2, 1)  # take two point clouds from the same surface S_A,S_B
         bsize = batch_data[0].shape[0]
-        split_neg = 0.5
+        cur_batch_data[0, 0:bsize, ...] = batch_surface[0][:, :NUM_POINT]
 
-        cur_batch_data[0,0:bsize,...] = batch_pos[0][:,:NUM_POINT]
+        # half on surface half off-surface
+        batch_label = np.split(batch_label, 2, 1)  # GT distances of close and far points
+        cur_batch_label_AB[:bsize, :] = np.concatenate(
+            [np.zeros([bsize, H_NUM_POINT]), batch_label[0][:, :int(H_NUM_POINT * split_off_surface)],
+             batch_label[1][:, int(H_NUM_POINT * split_off_surface):H_NUM_POINT]], 1)
 
-        if FLAGS.add_noise>0.0:
-            add_noise = np.random.randn(BATCH_SIZE,NUM_POINT,NUM_DIMS)*FLAGS.add_noise
+        # print(np.max(cur_batch_label_AB))
+        batch_off = np.concatenate([batch_data[1][:, :int(H_NUM_POINT * split_off_surface)],
+                                    batch_data[2][:, int(H_NUM_POINT * split_off_surface):H_NUM_POINT]], 1)
+        cur_batch_data[1, :bsize, ...] = np.concatenate([batch_surface[1][:, :H_NUM_POINT], batch_off], 1)
+
+        if FLAGS.add_noise > 0.0:
+            add_noise = np.random.randn(BATCH_SIZE, NUM_POINT, NUM_DIMS) * FLAGS.add_noise
         else:
-            add_noise = np.zeros([BATCH_SIZE,NUM_POINT,NUM_DIMS],'float32')
-
-        H_NUM_POINT = int(NUM_POINT/2)
-        q_NUM_POINT = int(NUM_POINT/4)
-        #half on surface half off-surface
-        batch_label = np.split(batch_label,2,1)
-        cur_batch_label_AB[:bsize, :] = np.concatenate([np.zeros([bsize,H_NUM_POINT]),batch_label[0][:,:int(H_NUM_POINT*split_neg)],batch_label[1][:,int(H_NUM_POINT*split_neg):H_NUM_POINT]],1)
-
-        batch_neg = np.concatenate([batch_data[1][:,:int(H_NUM_POINT*split_neg)],batch_data[2][:,int(H_NUM_POINT*split_neg):H_NUM_POINT]],1)
-        cur_batch_data[1,0:bsize,...] = np.concatenate([batch_pos[1][:,:H_NUM_POINT],batch_neg],1)
+            add_noise = np.zeros([BATCH_SIZE, NUM_POINT, NUM_DIMS], 'float32')
 
         feed_dict = {ops['pcA_pl']: cur_batch_data[0],
                      ops['pcB_pl']: cur_batch_data[1],
@@ -812,7 +815,7 @@ def eval_one_epoch_3d(sess, ops, test_writer, epoch):
     # Make sure batch data is of same size
     cur_batch_data = np.zeros((3,BATCH_SIZE, NUM_POINT, TRAIN_DATASET.num_channel()))
     cur_batch_label_AB = np.zeros((BATCH_SIZE,NUM_POINT), dtype=np.float32)
-    cur_batch_label_BA = -np.ones((BATCH_SIZE,NUM_POINT), dtype=np.float32)
+    cur_batch_label_BA = np.zeros((BATCH_SIZE,NUM_POINT), dtype=np.float32) #Remain empty (does not effect training)
 
 
     loss_sum = 0
@@ -821,31 +824,30 @@ def eval_one_epoch_3d(sess, ops, test_writer, epoch):
     log_string(str(datetime.now()))
     log_string('---- EPOCH %03d EVALUATION ----' % (EPOCH_CNT))
 
-    H_NUM_POINT = int(NUM_POINT / 2)
+
+    H_NUM_POINT = int(NUM_POINT / 2) # training points: half rely on the surface, half off the surface.
+    split_off_surface = 0.5  # how many points from close to surface set,and the rest from the unit cube
     while TEST_DATASET.has_next_batch():
 
         batch_data, batch_label = TEST_DATASET.next_batch(augment=False)
-
+        #dataset include 3 * 10k points on surface, close to surface, random from the unit cube.
         batch_data = np.split(batch_data, 3, 1)  # surface, close, far
-        batch_pos = np.split(batch_data[0], 2, 1)
+        batch_surface = np.split(batch_data[0], 2, 1)  # take two point clouds from the same surface S_A,S_B
         bsize = batch_data[0].shape[0]
-        split_neg = 0.5
-        cur_batch_data[0, 0:bsize, ...] = batch_pos[0][:, :NUM_POINT]
+        cur_batch_data[0, 0:bsize, ...] = batch_surface[0][:, :NUM_POINT]
+
+        #half on surface half off-surface
+        batch_label = np.split(batch_label,2,1) #GT distances of close and far points
+        cur_batch_label_AB[:bsize, :] = np.concatenate([np.zeros([bsize,H_NUM_POINT]),batch_label[0][:,:int(H_NUM_POINT*split_off_surface)],batch_label[1][:,int(H_NUM_POINT*split_off_surface):H_NUM_POINT]],1)
+
+        # print(np.max(cur_batch_label_AB))
+        batch_off = np.concatenate([batch_data[1][:,:int(H_NUM_POINT*split_off_surface)],batch_data[2][:,int(H_NUM_POINT*split_off_surface):H_NUM_POINT]],1)
+        cur_batch_data[1,:bsize,...] = np.concatenate([batch_surface[1][:,:H_NUM_POINT],batch_off],1)
 
         if FLAGS.add_noise > 0.0:
             add_noise = np.random.randn(BATCH_SIZE, NUM_POINT, NUM_DIMS) * FLAGS.add_noise
         else:
             add_noise = np.zeros([BATCH_SIZE, NUM_POINT, NUM_DIMS],'float32')
-
-        #
-        q_NUM_POINT = int(NUM_POINT/4)
-        #half on surface half off-surface
-        batch_label = np.split(batch_label,2,1)
-        cur_batch_label_AB[:bsize, :] = np.concatenate([np.zeros([bsize,H_NUM_POINT]),batch_label[0][:,:int(H_NUM_POINT*split_neg)],batch_label[1][:,int(H_NUM_POINT*split_neg):H_NUM_POINT]],1)
-        # print(np.max(cur_batch_label_AB))
-        batch_neg = np.concatenate([batch_data[1][:,:int(H_NUM_POINT*split_neg)],batch_data[2][:,int(H_NUM_POINT*split_neg):H_NUM_POINT]],1)
-        cur_batch_data[1,:bsize,...] = np.concatenate([batch_pos[1][:,:H_NUM_POINT],batch_neg],1)
-
 
         feed_dict = {ops['pcA_pl']: cur_batch_data[0],
                      ops['pcB_pl']: cur_batch_data[1],
