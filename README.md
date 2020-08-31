@@ -54,7 +54,10 @@ then use `dataset_sample_with_gt.py` to generate the off surface points and thei
         After generating/downloading the dataset for DPDist training, 
         for each category run the following:
         `python3 data_txt_to_hdf5.py --cat chair`
-
+    - Train an eval PCRNet:
+    
+        `./run_train_and_eval_PCRNet.bash`
+        
 The data and pre-trained models will be available soon.
 
 ### Updates
