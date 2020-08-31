@@ -41,6 +41,7 @@ After downloading the re-sampled data from PointNet++ repo into the following fo
 then use `dataset_sample_with_gt.py` to generate the off surface points and their GT distance.
     
     - Download generated data: ***Soon***
+        `python3 dataset_sample_with_gt.py --download 1`
 3. **Train DPDist**
     
     Run: `python3 train_multi_gpu_pc_compare_dist.py` (please see default parameters)
