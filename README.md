@@ -35,19 +35,25 @@ Under construction...
 2. **Data**
     
     We used [PointNet++ repo](https://github.com/charlesq34/pointnet2) dense resampling of 10k points from each CAD model of ModelNet40 to:
-(a) Get a normalized size point cloud, (b) get 10k points which are close to the surface and their ground truth distance, and (c) get 10k points which are somewhere in the unit cube and their GT distance.
+(a) Get a normalized size point cloud, (b) generate 10k points which are close to the surface and their ground truth distance, and (c) generate 10k points which are somewhere in the unit cube and their GT distance.
     
-    Generate data:
+    - Generate data:
 After downloading the re-sampled data from PointNet++ repo into the following folder: `data/modelnet40_normal_resampled`, 
 then use `dataset_sample_with_gt.py` to generate the off surface points and their GT distance.
     
-    Download generated data: ***Soon***
+    - Download generated data: ***Soon***
 3. **Train DPDist**
     
     Run: `train_multi_gpu_pc_compare_dist.py` (please see default parameters)
 4. **DPDist as a loss function**
+    - We use DPDist as loss function to train a registration network named PCRNet (**[[PCRNet Paper]](https://arxiv.org/abs/1908.07906)**).
+    - Dataset:
     
-    ***Soon***
+        First,`cd pcrnet-registration\utils`.
+        
+        After generating/downloading the dataset for DPDist training, 
+        for each category run the following:
+        `python3 data_txt_to_hdf5.py --cat chair`
 
 The data and pre-trained models will be available soon.
 

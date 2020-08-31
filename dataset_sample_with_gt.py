@@ -150,4 +150,4 @@ def get_data_files(split='train'):
 
 
 if __name__ == '__main__':
-    generate_points_with_gt(eps=0.05,cur_cls=['chair'])
+    generate_points_with_gt(eps=0.05,cur_cls=[])
