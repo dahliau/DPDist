@@ -10,11 +10,46 @@ Total: 3 * 10**4 points.
 created by: Dahlia Urbach
 TODO: add download link
 '''
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--download', default=0)
+FLAGS = parser.parse_args()
+DOWNLOAD = bool(FLAGS.download)
+
+
 import numpy as np
 import os
 DATA_ROOT = 'data/modelnet40_normal_resampled'
 from scipy.spatial import distance
 from scipy.spatial.distance import cdist
+
+###################### Data Downloading Operations #########################
+
+def download_data(file):
+    print('################### Downloading Data ###################')
+    from google_drive_downloader import GoogleDriveDownloader as gdd
+
+    if file == 'chair':
+        file_id = '1C4jUDyGmotioFRyXt3Dcp2JazOIbmcJy'
+
+    if not os.path.exists(os.path.join(os.getcwd(), 'data', 'modelnet40_normal_resampled')):
+         os.makedirs(os.path.join(os.getcwd(),'data','modelnet40_normal_resampled'))
+
+    if not os.path.exists(os.path.join(os.getcwd(),'data','modelnet40_normal_resampled',file)):
+        print("downloading...")
+        gdd.download_file_from_google_drive(file_id=file_id,
+										dest_path=os.path.join(os.getcwd(),'data','modelnet40_normal_resampled',file+'.zip'),
+										showsize=True,
+										unzip=True)
+
+        os.remove(os.path.join(os.getcwd(),'data','modelnet40_normal_resampled',file+'.zip'))
+    else:
+        print("This path already exists.")
+    return True
+
+
+###################### Data Generating Operations #########################
 
 def generate_points_with_gt(eps=0.05,min_eps = 0.001,num_neg_points=10**4,cur_cls=[]):
     datapath, shape_names, classes = get_data_files(split='test')
@@ -150,4 +185,7 @@ def get_data_files(split='train'):
 
 
 if __name__ == '__main__':
-    generate_points_with_gt(eps=0.05,cur_cls=[])
+    if DOWNLOAD:
+        download_data('chair')
+    else:
+        generate_points_with_gt(eps=0.05,cur_cls=[])

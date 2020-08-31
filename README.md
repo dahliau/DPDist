@@ -28,7 +28,6 @@ Preprint:
     }
 
 ### Instruction
-Under construction...
 1. **Requirements**
     
     Tensorflow>=1.14
@@ -44,17 +43,18 @@ then use `dataset_sample_with_gt.py` to generate the off surface points and thei
     - Download generated data: ***Soon***
 3. **Train DPDist**
     
-    Run: `train_multi_gpu_pc_compare_dist.py` (please see default parameters)
+    Run: `python3 train_multi_gpu_pc_compare_dist.py` (please see default parameters)
 4. **DPDist as a loss function**
     - We use DPDist as loss function to train a registration network named PCRNet (**[[PCRNet Paper]](https://arxiv.org/abs/1908.07906)**).
+    PCRNet code and requiements can be found here: https://github.com/vinits5/pcrnet 
     - Dataset:
     
-        First,`cd pcrnet-registration\utils`.
+        First, `cd pcrnet-registration\utils`
         
         After generating/downloading the dataset for DPDist training, 
         for each category run the following:
         `python3 data_txt_to_hdf5.py --cat chair`
-    - Train an eval PCRNet:
+    - Train and eval PCRNet:
     
         `./run_train_and_eval_PCRNet.bash`
         
