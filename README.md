@@ -40,11 +40,14 @@ Preprint:
 After downloading the re-sampled data from PointNet++ repo into the following folder: `data/modelnet40_normal_resampled`, 
 then use `dataset_sample_with_gt.py` to generate the off surface points and their GT distance.
     
-    - Download generated data: ***Soon***
+    - Download generated data:
+    
         `python3 dataset_sample_with_gt.py --download 1`
+
 3. **Train DPDist**
     
     Run: `python3 train_multi_gpu_pc_compare_dist.py` (please see default parameters)
+
 4. **DPDist as a loss function**
     - We use DPDist as loss function to train a registration network named PCRNet (**[[PCRNet Paper]](https://arxiv.org/abs/1908.07906)**).
     PCRNet code and requiements can be found here: https://github.com/vinits5/pcrnet 
