@@ -67,7 +67,7 @@ def _variable_on_cpu(name, shape, initializer, use_fp16=False):
     dtype = tf.float16 if use_fp16 else tf.float32
     var = tf.get_variable(name, shape, initializer=initializer, dtype=dtype)
     # tf.summary.histogram(name, var)
-    variable_summaries(var,name)
+    # variable_summaries(var,name)
     return var
 
 def _variable_with_weight_decay(name, shape, stddev, wd, use_xavier=True):
