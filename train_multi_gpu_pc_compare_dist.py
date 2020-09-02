@@ -52,7 +52,7 @@ parser.add_argument('--learning_rate_dpdist', type=float, default=0.0001, help='
 ##for 64 points 0.0001 mean loss: min ~ 0.02
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
-parser.add_argument('--decay_step', type=int, default=50*512, help='Decay step for lr decay [default: 50*512]')
+parser.add_argument('--decay_step', type=int, default=200*512, help='Decay step for lr decay [default: 200*512]')
 parser.add_argument('--decay_rate', type=float, default=0.5, help='Decay rate for lr decay [default: 0.5]')
 parser.add_argument('--encoder', default='3dmfv', help='dpdist encoder: 3dmfv [default:3dmfv]')
 parser.add_argument('--encoder_aue', default='pn', help='AUE encoder: pn [default:pn]')
