@@ -416,7 +416,7 @@ def eval_network(sess, ops, templates, poses):
 		# Display Loss Value.
 		# helper.display_three_clouds(TEMPLATE_DATA[0],SOURCE_DATA[0],template_data[0],"")
 		print("Batch: {} & time: {}, iteration: {}".format(fn, end-start, loop_idx+1))
-	
+
 	plot_iter_graph(TE,FLAGS.log_dir,'translation error')
 	plot_iter_graph(RE,FLAGS.log_dir,'rotation error')
 	plot_iter_graph(CE,FLAGS.log_dir,'convergence error')
@@ -431,6 +431,13 @@ def eval_network(sess, ops, templates, poses):
 	hf.close()
 
 def plot_iter_graph(X,LOG_DIR,name):
+	'''
+	View the iterative-PCRNet iteration convergence .
+	:param X: Translation/rotation errors
+	:param LOG_DIR: Save dir
+	:param name: File name
+	:return: Save images of rotation and translation error mean and variance (mean_var.jpg)
+	'''
 	itr= X.shape[0]
 	samples = X.shape[1]
 	x = np.tile(np.expand_dims(np.arange(itr),-1),[1,samples])

@@ -909,108 +909,53 @@ def local_z_2d(net, is_training,reuse=False,NUM_DIMS=2,k=3,overlap=True):
     # print(output)
     return output,C #[B,V,K**2*Z]
 def local_z_3d(net, is_training,reuse=False,NUM_DIMS=3,k=3,overlap=True):
-    WITH_GRAD=True
+    TF14=True #TF>14 extract_volume_patches works with gradients!
     with tf.variable_scope('local_z_3d', reuse=reuse) as sc:
         batch_size = net.shape[0].value
         num_vox = net.shape[1].value
-        E = net.shape[2].value
         grid_len = int(np.round(np.power(num_vox,1/3)))
 
         net = net[:,:int(grid_len**NUM_DIMS),:]
         net = tf.reshape(net,[batch_size,grid_len,grid_len,grid_len,-1])
 
-        if not WITH_GRAD:
+        if TF14:
             output = tf.extract_volume_patches(net,[1,k,k,k,1],[1,1,1,1,1],
                                     'SAME',
                                     name='EXTRACT_LOCAL_Z')
             X, Y, Z = get_grid_centers(num_vox, NUM_DIMS)
-            # kh = int(np.floor(k / 2))
-            # C = tf.stack([X[kh:-kh,kh:-kh,kh:-kh],
-            #               Y[kh:-kh,kh:-kh,kh:-kh],
-            #               Z[kh:-kh,kh:-kh,kh:-kh]],-1)
+
             C = tf.stack([X,Y,Z],-1)
             C = tf.cast(C,tf.float32)
             C = tf.reshape(C,[-1,NUM_DIMS])
             output = tf.reshape(output, [batch_size, output.shape[1].value ** 3, -1])
         # print(net)
         else:
-
             X,Y,Z = get_grid_centers(num_vox,NUM_DIMS)
             kh = int(np.floor(k / 2)) #half k
-            NEW_VER=True
-            if NEW_VER:
-                paddings = tf.constant([[0, 0],
-                                        [kh, kh],
-                                        [kh, kh],
-                                        [kh, kh],
-                                        [0, 0]])
-                net = tf.pad(net, paddings, "CONSTANT")  # [[0, 0, 0, 0, 0, 0, 0],
-                output = []
-                C = []
-                V = range(grid_len)  # Same size
-                for ii in V:
-                    for jj in V:
-                        for ll in V:
-                            z_iijjll = net[:,ii:ii+2*kh+1,
-                                       jj:jj + 2*kh + 1,
-                                       ll:ll + 2*kh + 1,:]  # kh+(ii-kh:ii+kh+1), BXKXKXKXE
-                            # if ii<kh or ii>(grid_len-kh) or\
-                            #     jj < kh or jj > (grid_len - kh) or\
-                            #     ll < kh or ll > (grid_len - kh):
-                            #     z_iijjll=0
-                            # else:
-                            #     z_iijjll = net[:,ii-kh:ii+kh+1,
-                            #            jj-k:jj + kh + 1,
-                            #            ll-k:ll + kh + 1,:]
-                            output.append(z_iijjll)
-                            c = tf.stack([X[ii,jj,ll],
-                                               Y[ii,jj,ll],
-                                               Z[ii,jj,ll]]) # (3,)
-                            C.append(c)
-                C = tf.stack(C)
-                output = tf.stack(output,1) #BxVxKxKxKxE
-                output = tf.reshape(output,[batch_size,output.shape[1].value,-1])
-            else:
-                # input_wrap = tf.zeros([batch_size,vec_size+2*k_half,vec_size+2*k_half]) #wrap with zeros
-                # print(input_wrap.shape)
-
-                # input_wrap[:,k_half:-k_half,k_half:-k_half] += net
-                output = []
-                # output = tf.zeros([batch_size,vec_size,vec_size,k,k])
-                if overlap:
-                    # V = range(k_half,vec_size-k_half) # only valid!
-                    V = range(vec_size) #Same size
-                else:
-                    V = range(k_half,vec_size-k_half,k)
-                C = []
-                for ii in V:
-                    for jj in V:
-                        for ll in V:
-                            z_iijj = []
-                            for i in range(-k_half,k_half+1):
-                                for j in range(-k_half, k_half+1):
-                                    for l in range(-k_half, k_half + 1):
-                                        if ii+i<0 or ii+i>vec_size-1 \
-                                                or jj+j<0 or jj+j>vec_size-1 \
-                                                or ll+l<0 or ll+l>vec_size-1:
-                                            z_ij = tf.constant(np.zeros([batch_size,E]),tf.float32)
-                                        else:
-                                            z_ij = net[:,ii+i,jj+j,ll+l,:] #BXE
-                                            # x,y = X[ii+i,jj+j],Y[ii+i,jj+j]
-                                            # print(x)
-                                        z_iijj.append(z_ij)
-                            c = tf.stack([X[ii, jj,ll], Y[ii, jj,ll], Z[ii,jj,ll]])
-                            C.append(c)
-                            z_iijj = tf.stack(z_iijj,1) #BXK**3XE
-                            output.append(z_iijj)
-                C = tf.stack(C)
-
-                output = tf.stack(output,1) #BXVXK**3XE
-                # output = tf.transpose(output,[2,0,1,3])
-                output = tf.reshape(output,[batch_size,output.shape[1].value,-1])
+            paddings = tf.constant([[0, 0],
+                                    [kh, kh],
+                                    [kh, kh],
+                                    [kh, kh],
+                                    [0, 0]])
+            net = tf.pad(net, paddings, "CONSTANT")  # [[0, 0, 0, 0, 0, 0, 0],
+            output = []
+            C = []
+            V = range(grid_len)  # Same size
+            for ii in V:
+                for jj in V:
+                    for ll in V:
+                        z_iijjll = net[:,ii:ii+2*kh+1,
+                                   jj:jj + 2*kh + 1,
+                                   ll:ll + 2*kh + 1,:]  # kh+(ii-kh:ii+kh+1), BXKXKXKXE
+                        output.append(z_iijjll)
+                        c = tf.stack([X[ii,jj,ll],
+                                           Y[ii,jj,ll],
+                                           Z[ii,jj,ll]]) # (3,)
+                        C.append(c)
+            C = tf.stack(C)
+            output = tf.stack(output,1) #BxVxKxKxKxE
+            output = tf.reshape(output,[batch_size,output.shape[1].value,-1])
         print('local_z')
-        # print(output)
-        # print(C)
 
     return output,C #[B,V,K**3*E]
 
