@@ -1,4 +1,4 @@
-# ***DPDist*** : Comparing Point Clouds Using Deep Point Cloud Distance (ECCV 2020)
+# ***DPDist***: Comparing Point Clouds Using Deep Point Cloud Distance (ECCV 2020)
 Created by [Dahlia Urbach](https://www.linkedin.com/in/dahlia-urbach-97a816123/), [Yizhak Ben-Shabat (Itzik)](http://www.itzikbs.com), and [Michael Lindenbaum](http://www.cs.technion.ac.il/people/mic/index.html) from Technion.
 
 ### Introduction
@@ -9,7 +9,7 @@ The surface is estimated locally using the 3D modified Fisher vector representat
 We test the proposed distance in challenging tasks, such as similar object comparison and registration, and show that it provides significant improvements over commonly used distances such as Chamfer distance,  Earth mover's distance, and others. 
 
 #### Videos
-- Our one minute video: [Video](https://www.youtube.com/watch?v=uiLmk19HFx0) 
+- Our one minute talk: [Video](https://www.youtube.com/watch?v=uiLmk19HFx0) 
 - Longer explanation video (presented in [iGDL](https://gdl-israel.github.io/)): [Video](https://youtu.be/c8_32IVn-sg?t=4494)
 
 ### Citation
@@ -53,10 +53,13 @@ then use `dataset_sample_with_gt.py` to generate the off surface points and thei
     PCRNet code and requiements can be found here: https://github.com/vinits5/pcrnet 
     - Dataset:
     
-        First, `cd pcrnet-registration\utils`
+        First, 
+        
+        `cd pcrnet-registration\utils`
         
         After generating/downloading the dataset for DPDist training, 
         for each category run the following:
+        
         `python3 data_txt_to_hdf5.py --cat chair`
     - Train and eval PCRNet:
     
