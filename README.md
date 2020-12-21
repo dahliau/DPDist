@@ -14,7 +14,8 @@ We test the proposed distance in challenging tasks, such as similar object compa
 
 ### Citation
 
-Full paper: https://arxiv.org/abs/2004.11784v2
+Full paper: https://link.springer.com/chapter/10.1007%2F978-3-030-58621-8_32
+arXiv version: https://arxiv.org/abs/2004.11784v2
 
 If you find our work useful in your research, please cite our work:
 
