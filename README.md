@@ -1,4 +1,4 @@
-# ***DPDist***: Comparing Point Clouds Using Deep Point Cloud Distance (ECCV 2020)
+# [ECCV 2020] ***DPDist***: Comparing Point Clouds Using Deep Point Cloud Distance 
 Created by [Dahlia Urbach](https://www.linkedin.com/in/dahlia-urbach-97a816123/), [Yizhak Ben-Shabat (Itzik)](http://www.itzikbs.com), and [Michael Lindenbaum](http://www.cs.technion.ac.il/people/mic/index.html) from Technion.
 
 ### Introduction
@@ -11,6 +11,7 @@ We test the proposed distance in challenging tasks, such as similar object compa
 #### Videos
 - Our one minute talk: [Video](https://www.youtube.com/watch?v=uiLmk19HFx0) 
 - Longer explanation video (presented in [iGDL](https://gdl-israel.github.io/)): [Video](https://youtu.be/c8_32IVn-sg?t=4494)
+- ECCV2020 talk: [Video](https://youtu.be/6G73JEut-UQ) 
 
 ### Citation
 
@@ -28,6 +29,8 @@ Preprint:
       journal={arXiv preprint arXiv:2004.11784},
       year={2020}
     }
+    
+Please cite as shown here: https://link.springer.com/chapter/10.1007%2F978-3-030-58621-8_32 
 
 ### Instruction
 1. **Requirements**
