@@ -21,17 +21,30 @@ arXiv version: https://arxiv.org/abs/2004.11784v2
 
 If you find our work useful in your research, please cite our work:
 
-Preprint: 
-
-    @article{urbach2020dpdist,
-      title={DPDist: Comparing Point Clouds Using Deep Point Cloud Distance},
-      author={Urbach, Dahlia and Ben-Shabat, Yizhak and Lindenbaum, Michael},
-      journal={arXiv preprint arXiv:2004.11784},
-      year={2020}
+    @inproceedings{DBLP:conf/eccv/UrbachBL20,
+      author    = {Dahlia Urbach and
+                   Yizhak Ben{-}Shabat and
+                   Michael Lindenbaum},
+      editor    = {Andrea Vedaldi and
+                   Horst Bischof and
+                   Thomas Brox and
+                   Jan{-}Michael Frahm},
+      title     = {DPDist: Comparing Point Clouds Using Deep Point Cloud Distance},
+      booktitle = {Computer Vision - {ECCV} 2020 - 16th European Conference, Glasgow,
+                   UK, August 23-28, 2020, Proceedings, Part {XI}},
+      series    = {Lecture Notes in Computer Science},
+      volume    = {12356},
+      pages     = {545--560},
+      publisher = {Springer},
+      year      = {2020},
+      url       = {https://doi.org/10.1007/978-3-030-58621-8\_32},
+      doi       = {10.1007/978-3-030-58621-8\_32},
+      timestamp = {Fri, 09 Apr 2021 18:43:56 +0200},
+      biburl    = {https://dblp.org/rec/conf/eccv/UrbachBL20.bib},
+      bibsource = {dblp computer science bibliography, https://dblp.org}
     }
-    
-Please cite as shown here: https://link.springer.com/chapter/10.1007%2F978-3-030-58621-8_32 
 
+    
 ### Instruction
 1. **Requirements**
     
