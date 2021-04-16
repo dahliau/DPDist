@@ -44,6 +44,8 @@ If you find our work useful in your research, please cite our work:
       bibsource = {dblp computer science bibliography, https://dblp.org}
     }
 
+Dahlia Urbach, Yizhak Ben-Shabat, and Michael Lindenbaum. Dpdist: Comparing pointclouds using deep point cloud distance. In Andrea Vedaldi, Horst Bischof, Thomas Brox, and Jan-Michael Frahm, editors,Computer Vision - ECCV 2020 - 16th European Conference, Glasgow, UK, August 23-28, 2020, Proceedings, Part XI, volume 12356 of Lecture Notes in Computer Science, pages 545–560. Springer, 2020.
+
     
 ### Instruction
 1. **Requirements**
