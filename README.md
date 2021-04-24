@@ -5,7 +5,7 @@ Created by [Dahlia Urbach](https://www.linkedin.com/in/dahlia-urbach-97a816123/)
 ![teaser](images/teaser.PNG)
 
 We introduce a new deep learning method for point cloud comparison.  Our approach, named Deep Point Cloud Distance (DPDist),   measures the distance between the points in one cloud and the estimated surface from which the other point cloud is sampled. 
-The surface is estimated locally using the 3D modified Fisher vector representation. The local representation reduces the complexity of the surface, enabling effective learning, which generalizes well between object categories. 
+The surface is estimated locally using the 3D modified Fisher vector representation and an implicit neural function. The local representation reduces the complexity of the surface, enabling effective learning, which generalizes well between object categories. 
 We test the proposed distance in challenging tasks, such as similar object comparison and registration, and show that it provides significant improvements over commonly used distances such as Chamfer distance,  Earth mover's distance, and others. 
 
 #### Videos
