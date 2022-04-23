@@ -58,84 +58,85 @@ def download_data(file):
 ###################### Data Generating Operations #########################
 
 def generate_points_with_gt(eps=0.05,min_eps = 0.001,num_neg_points=10**4,cur_cls=[]):
-    datapath, shape_names, classes = get_data_files(split='test')
-    start_t = time()
-    for index in tqdm(range(len(datapath))):
-        fn = datapath[index]
-        cls = classes[datapath[index][0]]
-        shape = shape_names[index]
-        if (shape in cur_cls) or (cur_cls==[]):
-            cur_start_t = time()
+    for split in ['test','train']:
+        datapath, shape_names, classes = get_data_files(split=split)
+        start_t = time()
+        for index in tqdm(range(len(datapath))):
+            fn = datapath[index]
+            cls = classes[datapath[index][0]]
+            shape = shape_names[index]
+            if (shape in cur_cls) or (cur_cls==[]):
+                cur_start_t = time()
 
-            fn_pos = fn[1][:-4] +'_dist_c_scaled.txt'
-            fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_l.txt'
-            fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_u.txt'
+                fn_pos = fn[1][:-4] +'_dist_c_scaled.txt'
+                fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_l.txt'
+                fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_u.txt'
 
-            if os.path.exists(fn_pos) and  os.path.exists(fn_neg) and  os.path.exists(fn_neg):
-                print('data already exist for: {}'.format(fn[1]))
-                continue
+                if os.path.exists(fn_pos) and  os.path.exists(fn_neg) and  os.path.exists(fn_neg):
+                    print('data already exist for: {}'.format(fn[1]))
+                    continue
 
-            point_set = np.loadtxt(fn[1], delimiter=',').astype(np.float32)
-            # Take the first npoints
-            point_set = point_set[:, 0:3]
-            point_set = point_set*0.8
+                point_set = np.loadtxt(fn[1], delimiter=',').astype(np.float32)
+                # Take the first npoints
+                point_set = point_set[:, 0:3]
+                point_set = point_set*0.8
 
-            flag = 0
-            size_l = 0
-            size_u = 0
-            while size_l<num_neg_points:
-                neg_set_rand = uniform_sampeling(shape=[1, 50000, 3])[0]
-                #scale point set:
-                dist = cdist(point_set, neg_set_rand)
-                dist_AB = dist.min(0)
-                f=2
-                ind_l = (dist_AB>min_eps) &(dist_AB<f*eps)
-                neg_set_rand = np.concatenate([neg_set_rand,np.expand_dims(dist_AB,-1)],-1)
-                if flag:
-                    neg_set_l = np.concatenate([neg_set_l,neg_set_rand[ind_l]],0)
-                else:
-                    neg_set_l = neg_set_rand[ind_l]
-                size_l = len(neg_set_l)
-
-                ind_u = dist_AB>f*eps
-                if size_u<num_neg_points:
+                flag = 0
+                size_l = 0
+                size_u = 0
+                while size_l<num_neg_points:
+                    neg_set_rand = uniform_sampeling(shape=[1, 50000, 3])[0]
+                    #scale point set:
+                    dist = cdist(point_set, neg_set_rand)
+                    dist_AB = dist.min(0)
+                    f=2
+                    ind_l = (dist_AB>min_eps) &(dist_AB<f*eps)
+                    neg_set_rand = np.concatenate([neg_set_rand,np.expand_dims(dist_AB,-1)],-1)
                     if flag:
-                        neg_set_u = np.concatenate([neg_set_u,neg_set_rand[ind_u]],0)
+                        neg_set_l = np.concatenate([neg_set_l,neg_set_rand[ind_l]],0)
                     else:
-                        flag = 1 #only in the first iteration
-                        neg_set_u = neg_set_rand[ind_u]
-                    size_u = len(neg_set_u)
-            neg_set_l = neg_set_l[:num_neg_points]
-            neg_set_u = neg_set_u[:num_neg_points]
+                        neg_set_l = neg_set_rand[ind_l]
+                    size_l = len(neg_set_l)
 
-            #add 10% out of unit circle
-            neg_set_uu = []
-            num_neg_out_circle = int(num_neg_points*0.1)
-            flag = 0
-            size_uu = 0
-            while size_uu<num_neg_out_circle:
-                neg_set_rand = uniform_sampeling(shape=[1, 50000, 3],type='cube')[0]
-                ind = np.sqrt(np.sum(np.square(neg_set_rand),-1))>1
-                neg_set_rand = neg_set_rand[ind]
-                dist = cdist(point_set, neg_set_rand)
-                dist_AB = dist.min(0)
-                neg_set_rand = np.concatenate([neg_set_rand, np.expand_dims(dist_AB, -1)], -1)
-                if flag:
-                    neg_set_uu = np.concatenate([neg_set_uu, neg_set_rand], 0)
-                else:
-                    flag=1
-                    neg_set_uu = neg_set_rand
-                size_uu = len(neg_set_uu)
-            neg_set_u[-num_neg_out_circle:] = neg_set_uu[:num_neg_out_circle]
+                    ind_u = dist_AB>f*eps
+                    if size_u<num_neg_points:
+                        if flag:
+                            neg_set_u = np.concatenate([neg_set_u,neg_set_rand[ind_u]],0)
+                        else:
+                            flag = 1 #only in the first iteration
+                            neg_set_u = neg_set_rand[ind_u]
+                        size_u = len(neg_set_u)
+                neg_set_l = neg_set_l[:num_neg_points]
+                neg_set_u = neg_set_u[:num_neg_points]
 
-            #save data as txt:
-            np.savetxt(fn_pos,point_set,fmt='%.6f', delimiter=',')
-            np.savetxt(fn_neg,neg_set_l,fmt='%.6f', delimiter=',')
-            np.savetxt(fn_neg,neg_set_u,fmt='%.6f', delimiter=',')
-            end_t = time()
-            print('processing time: {}'.format(end_t - cur_start_t))
-    end_t = time()
-    print('processing time: {}'.format(end_t-start_t))
+                #add 10% out of unit circle
+                neg_set_uu = []
+                num_neg_out_circle = int(num_neg_points*0.1)
+                flag = 0
+                size_uu = 0
+                while size_uu<num_neg_out_circle:
+                    neg_set_rand = uniform_sampeling(shape=[1, 50000, 3],type='cube')[0]
+                    ind = np.sqrt(np.sum(np.square(neg_set_rand),-1))>1
+                    neg_set_rand = neg_set_rand[ind]
+                    dist = cdist(point_set, neg_set_rand)
+                    dist_AB = dist.min(0)
+                    neg_set_rand = np.concatenate([neg_set_rand, np.expand_dims(dist_AB, -1)], -1)
+                    if flag:
+                        neg_set_uu = np.concatenate([neg_set_uu, neg_set_rand], 0)
+                    else:
+                        flag=1
+                        neg_set_uu = neg_set_rand
+                    size_uu = len(neg_set_uu)
+                neg_set_u[-num_neg_out_circle:] = neg_set_uu[:num_neg_out_circle]
+
+                #save data as txt:
+                np.savetxt(fn_pos,point_set,fmt='%.6f', delimiter=',')
+                np.savetxt(fn_neg,neg_set_l,fmt='%.6f', delimiter=',')
+                np.savetxt(fn_neg,neg_set_u,fmt='%.6f', delimiter=',')
+                end_t = time()
+                print('processing time: {}'.format(end_t - cur_start_t))
+        end_t = time()
+        print('processing time: {}'.format(end_t-start_t))
 
 def uniform_sampeling(vmin=-1, vmax=1, shape=[4, 1024, 3], type='dropped_coordinates'):
     '''
