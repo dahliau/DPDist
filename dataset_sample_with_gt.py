@@ -16,6 +16,7 @@ https://shapenet.cs.stanford.edu/media/modelnet40_normal_resampled.zip
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--download', default=0)
+parser.add_argument('--only_chair', action='store_true')
 FLAGS = parser.parse_args()
 DOWNLOAD = bool(FLAGS.download)
 
@@ -203,5 +204,7 @@ def get_data_files(split='train'):
 if __name__ == '__main__':
     if DOWNLOAD:
         download_data('chair')
-    else:
+    if FLAGS.only_chair:
         generate_points_with_gt(eps=0.05,cur_cls=['chair'])
+    else:
+        generate_points_with_gt(eps=0.05)
