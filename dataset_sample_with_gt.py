@@ -8,7 +8,9 @@ Outputs:
 Total: 3 * 10**4 points.
 
 created by: Dahlia Urbach
-TODO: add download link
+
+Dataset can be download from: https://github.com/charlesq34/pointnet2:
+https://shapenet.cs.stanford.edu/media/modelnet40_normal_resampled.zip
 '''
 
 import argparse
@@ -19,10 +21,14 @@ DOWNLOAD = bool(FLAGS.download)
 
 
 import numpy as np
+from numpy.random import random
 import os
 DATA_ROOT = 'data/modelnet40_normal_resampled'
 from scipy.spatial import distance
 from scipy.spatial.distance import cdist
+from tqdm import tqdm
+from time import time
+import wget
 
 ###################### Data Downloading Operations #########################
 
@@ -48,17 +54,26 @@ def download_data(file):
         print("This path already exists.")
     return True
 
-
 ###################### Data Generating Operations #########################
 
 def generate_points_with_gt(eps=0.05,min_eps = 0.001,num_neg_points=10**4,cur_cls=[]):
     datapath, shape_names, classes = get_data_files(split='test')
-    for index in range(len(datapath)):
-        print('index:', index,' out of ',len(datapath))
+    start_t = time()
+    for index in tqdm(range(len(datapath))):
         fn = datapath[index]
         cls = classes[datapath[index][0]]
         shape = shape_names[index]
         if (shape in cur_cls) or (cur_cls==[]):
+            cur_start_t = time()
+
+            fn_pos = fn[1][:-4] +'_dist_c_scaled.txt'
+            fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_l.txt'
+            fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_u.txt'
+
+            if os.path.exists(fn_pos) and  os.path.exists(fn_neg) and  os.path.exists(fn_neg):
+                print('data already exist for: {}'.format(fn[1]))
+                continue
+
             point_set = np.loadtxt(fn[1], delimiter=',').astype(np.float32)
             # Take the first npoints
             point_set = point_set[:, 0:3]
@@ -112,12 +127,14 @@ def generate_points_with_gt(eps=0.05,min_eps = 0.001,num_neg_points=10**4,cur_cl
                 size_uu = len(neg_set_uu)
             neg_set_u[-num_neg_out_circle:] = neg_set_uu[:num_neg_out_circle]
 
-            fn_pos = fn[1][:-4] +'_dist_c_scaled.txt'
+            #save data as txt:
             np.savetxt(fn_pos,point_set,fmt='%.6f', delimiter=',')
-            fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_l.txt'
             np.savetxt(fn_neg,neg_set_l,fmt='%.6f', delimiter=',')
-            fn_neg = fn[1][:-4] + '_'+str(num_neg_points)+'_dist_c_neg_u.txt'
             np.savetxt(fn_neg,neg_set_u,fmt='%.6f', delimiter=',')
+            end_t = time()
+            print('processing time: {}'.format(end_t - cur_start_t))
+    end_t = time()
+    print('processing time: {}'.format(end_t-start_t))
 
 def uniform_sampeling(vmin=-1, vmax=1, shape=[4, 1024, 3], type='dropped_coordinates'):
     '''
@@ -128,7 +145,6 @@ def uniform_sampeling(vmin=-1, vmax=1, shape=[4, 1024, 3], type='dropped_coordin
     :param type: cube/muller/polar/exponential/dropped_coordinates
     :return:
     '''
-    from numpy.random import random
     batch_size = shape[0]
     num_points = shape[1]
     dims = shape[2]
@@ -188,4 +204,4 @@ if __name__ == '__main__':
     if DOWNLOAD:
         download_data('chair')
     else:
-        generate_points_with_gt(eps=0.05,cur_cls=[])
+        generate_points_with_gt(eps=0.05,cur_cls=['chair'])
